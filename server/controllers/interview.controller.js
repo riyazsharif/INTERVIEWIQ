@@ -135,7 +135,7 @@ Generate exactly 5 interview questions.
 Rules:
 - Each question 15–25 words
 - One sentence
-- One question per line
+- One question per line 
 - No numbering
 `,
       },
@@ -206,7 +206,7 @@ export const sumbitAnswer = async (req, res) => {
       return res.status(404).json({ message: "Interview not found" });
     }
 
-    const questions = interview.questions || interview.question || [];
+    const questions = interview.questions || interview.questions || [];
     const question = questions[questionIndex];
 
     if (!answer) {
@@ -299,8 +299,8 @@ export const finishInterview = async (req, res) => {
       return res.status(400).json({ message: "failed to find Interview" });
     }
 
-    const questions = interview.questions || interview.question || [];
-    const totalQuestions = questions.length;
+    const questions = interview.questions || interview.questions || [];
+    const totalQuestions = interview.questions.length;
 
     let totalScore = 0;
     let totalConfidence = 0;
