@@ -5,6 +5,7 @@ import { analyzeResume, finishInterview, generateQuestion, sumbitAnswer } from "
 
 
 const interviewRouter = express.Router()
+
 interviewRouter.post("/resume", isAuth, upload.single("resume"), analyzeResume)
 interviewRouter.post("/generate-questions", isAuth, generateQuestion)
 interviewRouter.post("/sumbit-answer", isAuth, sumbitAnswer)

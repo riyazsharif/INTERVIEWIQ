@@ -13,7 +13,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../redux/userSlice";
 
-function Setp1Setup({ onStart }) {
+function   Setp1Setup({ onStart }) {
   const { userData } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [role, setRole] = useState("");
@@ -218,7 +218,7 @@ function Setp1Setup({ onStart }) {
                     <p className="font-medium text-gray-700 mb-1">Projects:</p>
                     <ul className="list-disc list-inside text-gray-600 space-y-1">
                       {projects.map((p, i) => (
-                        <li key={i}>{p}</li>
+                        <li key={i}> {p}</li>
                       ))}
                     </ul>
                   </div>
