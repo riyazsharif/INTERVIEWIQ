@@ -1,7 +1,7 @@
 import Payment from "../models/payment.model.js";
 import razorpay from "../services/razorpay.service.js";
 import crypto from "crypto";
-import User from './../models/User.model';
+import User from './../models/User.model.js';
 
 export const createOrder = async (req, res) => {
   try {
