@@ -3,19 +3,18 @@ import maleVideo from "../assets/Videos/male-ai.mp4";
 import femaleVideo from "../assets/Videos/female-ai.mp4";
 import Timer from "./Timer";
 import {motion} from "motion/react"
-import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
+import { FaMicrophone, FaMicrophoneSlash} from "react-icons/fa";
 import { useState } from 'react'
 import axios from "axios";
 import { useRef } from 'react'
-import { sumbitAnswer } from './../../../server/controllers/interview.controller';
-import { set } from "mongoose";
-import Interview from './../../../server/models/interview.model';
+import { serverUrl } from "../App";
+import {BsArrowLeft} from "react-icons/bs"
 
 function Step2Interview({ interviewData, onFinish }) {
 
 const { interviewId, questions, userName } = interviewData;
 const [isIntroPhase, setIsIntroPhase] = useState(true);
-const [isMicon, setIsMicon] = useState(true);
+const [isMicOn, setIsMicOn] = useState(true);
 const recognitionRef = useRef (null);
 const [isAIPlaying, setIsAIPlaying] = useState(false);
 const [currentIndex, setCurrentIndex] = useState(0);
@@ -116,7 +115,7 @@ const speak = (text) => {
       setIsAIPlaying(false);
 
 
-      if(isMicon){
+      if(isMicOn){
         startMic();
       }
 
@@ -139,19 +138,19 @@ if(selectedVoice) {
 }
 const runIntro = async () => {
   if (isIntroPhase) {
-    await speakText(`Hello ${userName}, its great to meet you today. I hope you are doing well. `);
-    await speakText("I will ask you a few questions. Just answer naturally, and take your time. Let's get started.");
+    await speak(`Hello ${userName}, its great to meet you today. I hope you are doing well. `);
+    await speak("I will ask you a few questions. Just answer naturally, and take your time. Let's get started.");
     setIsIntroPhase(false);
   }else if (currentQuestion) {
     await new Promise(r => setTimeout(r, 500));
 
     //if last question hard level
     if(currentIndex === questions.length - 1) {
-      await speakText("This is the last question, and its a hard one. But I believe in you, you can do it!");
+      await speak("This is the last question, and its a hard one. But I believe in you, you can do it!");
     }
-    await speakText(currentQuestion.question);
+    await speak(currentQuestion.question);
 
-    if(isMicon){
+    if(isMicOn){
       startMic();
     }
 
@@ -165,7 +164,7 @@ const runIntro = async () => {
 useEffect(() => {
   if(isIntroPhase) return;
   if(!currentQuestion) return;
-  if(isSubmitting) return;
+
   const timer = setInterval(() => {
     setTimeLeft((prev) => {
       if (prev <= 1) {
@@ -178,7 +177,13 @@ useEffect(() => {
  
    return ()=> clearInterval(timer);
 
-},[isIntroPhase, currentQuestion, isSubmitting])
+},[isIntroPhase, currentQuestion])
+
+useEffect(() => {
+  if (!isIntroPhase && currentQuestion) {
+    setTimeLeft(currentQuestion.timeLimit || 60);
+  }
+}, [currentIndex]);
 
 
 useEffect(() => {
@@ -201,7 +206,7 @@ useEffect(() => {
 
 
 const startMic = () => {
-  if (!recognitionRef.current && !isAIPlaying){
+  if (recognitionRef.current && !isAIPlaying){
     try{
       recognitionRef.current.start();
     } catch { }
@@ -215,29 +220,28 @@ const stopMic = () => {
 };
 
 const toggleMic = () => {
-  if (isMicon) {
-    startMic();
-  } else {
+  if (isMicOn) {
     stopMic();
+  } else {
+    startMic();
   } 
-  setIsMicon(!isMicon);
+  setIsMicOn(!isMicOn);
 };
 
 
-const sumbitAnswer = async () => {
+const submitAnswer = async () => {
   if(isSubmitting) return;
    stopMic();
   setIsSubmitting(true);
 
   try {
-    const result = await axios.post(ServerURL + "/api/interview/submit-answer", {
+    const result = await axios.post(serverUrl + "/api/interview/submit-answer", {
       interviewId,
-      questionIndedx: currentIndex,
+      questionIndex: currentIndex,
       answer,
       timeTaken: currentQuestion.timeLimit - timeLeft,
     },{withCredentials:true})
     setFeedback(result.data.feedback);
-    setText(result.data.text);
     setIsSubmitting(false);
 
 }catch (error) {
@@ -255,7 +259,7 @@ const handleNext = async () => {
     return;
   }
 
-  await speakText("Alright, let's move to the next question.");
+  await speak("Alright, let's move to the next question.");
 
   setCurrentIndex(currentIndex + 1);
   setTimeout(() => {
@@ -268,7 +272,7 @@ const finishInterview = async () => {
   stopMic()
   setIsMicOn(false)
   try {
-    const result = await axios.post(ServerUrl + "/api/Interview/finish", {
+    const result = await axios.post(serverUrl + "/api/interview/finish", {
       interviewId}, {withCredentials:true})
       console.log(result.data);
       onFinish(result.data);
@@ -285,7 +289,7 @@ useEffect(() => {
   if(!currentQuestion) return;  
 
   if (timeLeft === 0 && !isSubmitting && !feedback) {
-  handleSubmit();
+  submitAnswer();
 }
 }, [timeLeft]);
 
@@ -385,12 +389,12 @@ useEffect(() => {
               onClick={toggleMic}
               whileTap={{scale:0.9}}
               className='w-12 h-12 sm:w-14 flex items-center justify-center rounded-full bg-black text-white shadow-lg'>
-               {isMicon ? <FaMicrophone /> : <FaMicrophoneSlash size={20}/>}
+               {isMicOn ? <FaMicrophone /> : <FaMicrophoneSlash size={20}/>}
             </motion.button>
            
 
               <motion.button 
-              onClick={sumbitAnswer}
+              onClick={submitAnswer}
                 disabled={isSubmitting }
               whileTap={{scale:0.95}}
               className='flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-3 sm:py-4 rounded-2xl shadow-lg hover:opacity-90 transition font-semibold disabled:bg-gray-500'>
@@ -407,7 +411,8 @@ useEffect(() => {
 
               <button 
               onClick={handleNext}
-              className='w-full bg-gradient-to-r from-emerald-600 to-teal-500 text-white py-3 rounded-xl shadow-md hover:opacity-90 transition flex items-center justify-center gap-1 '>  </button>
+              className='w-full bg-gradient-to-r from-emerald-600 to-teal-500 text-white py-3 rounded-xl shadow-md hover:opacity-90 transition flex items-center justify-center gap-1 '> Next Question<BsArrowRight size={18}/> 
+              </button>
 
           </motion.div>
 

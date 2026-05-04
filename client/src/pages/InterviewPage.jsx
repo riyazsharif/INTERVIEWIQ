@@ -8,8 +8,9 @@ import Step3Report from "../components/Step3Report";
 function InterviewPage() {
   const { userData } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const [step, setStep] = useState(2);
+  const [step, setStep] = useState(1);
   const [interviewData, setInterviewData] = useState(null);
+  const [reportData, setReportData] = useState(null);
 
   useEffect(() => {
     if (!userData) {
@@ -32,12 +33,13 @@ function InterviewPage() {
         <Step2Interview
           interviewData={interviewData}
           onFinish={(Report) => {
+            setReportData(Report);
             setStep(3);
           }}
         />
       )}
 
-      {step == 3 && <Step3Report report={interviewData} />}
+      {step == 3 && <Step3Report report={reportData} />}
     </div>
   );
 }
