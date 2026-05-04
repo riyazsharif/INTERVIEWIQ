@@ -32,7 +32,7 @@ export const GoogleAuth = async (req, res) => {
     });
   }
 };
-
+// Logout function to clear the token cookie
 export const logOut = async (req, res) => {
   try {
     res.clearCookie("token");
