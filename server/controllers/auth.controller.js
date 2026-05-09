@@ -1,5 +1,5 @@
 import genToken from "../config/token.js";
-import User from "../models/user.model.js";
+import User from "../models/User.model.js";
 
 export const GoogleAuth = async (req, res) => {
   try {
@@ -23,8 +23,7 @@ export const GoogleAuth = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // Return the user object directly so the frontend can use it consistently
-    return res.status(200).json(user);
+    return res.status(200).json({ user, token });
   } catch (error) {
     console.error("GoogleAuth error details:", error);
     return res.status(500).json({

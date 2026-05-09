@@ -1,8 +1,17 @@
 import fs from "fs";
+import { fileURLToPath } from "url"; // ← ye add karo
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
-import { askAi } from "../services/openRouter.Service.js";
+import { askAi } from "../services/openRouter.service.js";
 import User from "../models/User.model.js";
 import Interview from "../models/interview.model.js";
+
+// baaki sab same
+pdfjsLib.GlobalWorkerOptions.workerSrc = fileURLToPath(
+  new URL(
+    "../node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs",
+    import.meta.url
+  )
+);
 
 export const analyzeResume = async (req, res) => {
   try {
@@ -101,9 +110,9 @@ export const generateQuestion = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    if (user.credits < 50) {
+    if (user.credits < 5) {
       return res.status(403).json({
-        message: "Not enough credits. Minimum 50 required.",
+        message: "Not enough credits. Minimum 5 required.",
       });
     }
 
@@ -165,7 +174,7 @@ Rules:
       });
     }
 
-    user.credits -= 50;
+    user.credits -= 5;
     await user.save();
 
     const interview = await Interview.create({

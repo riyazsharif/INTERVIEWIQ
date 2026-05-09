@@ -3,19 +3,26 @@ import { Route, Routes } from 'react-router-dom'
 import Home from './pages/Home'
 import Auth from './pages/Auth'
 import { useEffect } from 'react'
-import axios from 'axios'
 import { useDispatch } from "react-redux"
 import { setUserData } from './redux/userSlice.js'
 import InterviewPage from './pages/InterviewPage.jsx'
-export const serverUrl = "http://localhost:8000"
+import api from './utils/api.js'
+
 function App() {
  
   const dispatch=useDispatch()
    
   useEffect(() => {
     const getUser = async () => {
+      const token = localStorage.getItem("token")
+
+      if (!token) {
+        dispatch(setUserData(null))
+        return
+      }
+
       try {
-        const result = await axios.get(serverUrl + "/api/user/current-user", { withCredentials: true })
+        const result = await api.get("/api/user/current-user")
         dispatch(setUserData(result.data))
         
       } catch (error) {

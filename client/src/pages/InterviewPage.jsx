@@ -8,7 +8,7 @@ import Step3Report from "../components/Step3Report";
 function InterviewPage() {
   const { userData } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const [step, setStep] = useState(2);
+  const [step, setStep] = useState(1);
   const [interviewData, setInterviewData] = useState(null);
 
   useEffect(() => {
