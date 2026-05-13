@@ -6,6 +6,9 @@ import { useEffect } from 'react'
 import { useDispatch } from "react-redux"
 import { setUserData } from './redux/userSlice.js'
 import InterviewPage from './pages/InterviewPage.jsx'
+import InterviewReport from "./pages/InterviewReport";
+import Pricing from "./pages/Pricing.jsx"  
+
 import api from './utils/api.js'
 
 function App() {
@@ -37,7 +40,9 @@ function App() {
       <Route path='/' element={<Home/>} />
       <Route path='/auth' element={<Auth/>} />
       <Route path='/interview' element={<InterviewPage/>} />
-   </Routes>
+      <Route path="/history" element={<InterviewReport />} />
+      <Route path="/pricing" element={<Pricing />} />
+    </Routes>
   )
 }
 

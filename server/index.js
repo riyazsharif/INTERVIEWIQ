@@ -6,6 +6,7 @@ import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
 import interviewRouter from "./routes/interview.routes.js";
+import paymentRouter from "./routes/payment.routes.js";
 dotenv.config();
 const app = express();
 
@@ -31,7 +32,7 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
-
+app.use("/api/payment", paymentRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter)
 app.use("/api/interview",interviewRouter)
@@ -51,3 +52,5 @@ const startServer = async () => {
 };
 
 startServer();
+
+
