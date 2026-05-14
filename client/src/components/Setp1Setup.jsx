@@ -7,8 +7,7 @@ import {
   FaMicrophoneAlt,
   FaChartLine,
 } from "react-icons/fa";
-import axios from "axios";
-import { serverUrl } from "../App";
+import api from "../utils/api.js";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../redux/userSlice";
@@ -35,11 +34,7 @@ function Setp1Setup({ onStart }) {
     const formdata = new FormData();
     formdata.append("resume", resumeFile);
     try {
-      const result = await axios.post(
-        serverUrl + "/api/interview/resume",
-        formdata,
-        { withCredentials: true },
-      );
+      const result = await api.post("/api/interview/resume", formdata);
       console.log(result.data);
 
       setRole(result.data.role || "");
@@ -48,6 +43,7 @@ function Setp1Setup({ onStart }) {
       setSkills(result.data.skills || []);
       setResumeText(result.data.resumeText || "");
       setAnalysisDone(true);
+      setAnalyzing(false);
     } catch (error) {
       console.log(error);
       setAnalyzing(false);
@@ -57,11 +53,14 @@ function Setp1Setup({ onStart }) {
     setError("");
     setLoading(true);
     try {
-      const result = await axios.post(
-        serverUrl + "/api/interview/generate-questions",
-        { role, experience, mode, resumeText, projects, skills },
-        { withCredentials: true },
-      );
+      const result = await api.post("/api/interview/generate-questions", {
+        role,
+        experience,
+        mode,
+        resumeText,
+        projects,
+        skills,
+      });
       console.log(result.data);
       if (userData) {
         dispatch(setUserData({ ...userData, credits: result.data.creditLeft }));

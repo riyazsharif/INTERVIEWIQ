@@ -1,15 +1,14 @@
 import React, { useState } from 'react'
-import axios from "axios";
 import { useDispatch, useSelector } from 'react-redux'
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { BsRobot, BsCoin } from "react-icons/bs";
 import { HiOutlineLogout } from "react-icons/hi";
 import { FaUserAstronaut } from "react-icons/fa";
 import{ useNavigate} from 'react-router-dom'
 import { setUserData } from '../redux/userSlice';
-import { serverUrl } from '../App';
 import Auth from '../pages/Auth';
 import AuthModel from './AuthModel';
+import api from "../utils/api.js";
 function Navbar() {
   const { userData } = useSelector((state) => state.user)
   const [showCreditPopup, setShowCreditPopup] = useState(false)
@@ -19,7 +18,8 @@ function Navbar() {
   const [showAuth, setShowAuth] = useState(false);
   const handleLogout = async () => {
     try {
-      await axios.get(serverUrl + "/api/auth/logout", {withCredentials:true})
+      await api.get("/api/auth/logout")
+      localStorage.removeItem("token");
       dispatch(setUserData(null))
       setShowCreditPopup(false)
       setShowUserPopup(false)

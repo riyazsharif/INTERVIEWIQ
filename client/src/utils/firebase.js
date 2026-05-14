@@ -1,13 +1,21 @@
 
 import { initializeApp } from "firebase/app";
 import {getAuth, GoogleAuthProvider} from "firebase/auth"
+
+const requiredFirebaseEnv = ["VITE_FIREBASE_APIKEY", "VITE_FIREBASE_AUTH_DOMAIN", "VITE_FIREBASE_PROJECT_ID"];
+for (const key of requiredFirebaseEnv) {
+  if (!import.meta.env[key]) {
+    throw new Error(`Missing Firebase env variable: ${key}`);
+  }
+}
+
 const firebaseConfig = {
-  apiKey:import.meta.env.VITE_FIREBASE_APIKEY,
-  authDomain: "interviwewiq.firebaseapp.com",
-  projectId: "interviwewiq",
-  storageBucket: "interviwewiq.firebasestorage.app",
-  messagingSenderId: "383165590547",
-  appId: "1:383165590547:web:9eb20cdce67925d596a3e6"
+  apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);

@@ -8,8 +8,9 @@ import Step3Report from "../components/Step3Report";
 function InterviewPage() {
   const { userData } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const [step, setStep] = useState(2);
+  const [step, setStep] = useState(1);
   const [interviewData, setInterviewData] = useState(null);
+  const [reportData, setReportData] = useState(null); // ✅ alag state report ke liye
 
   useEffect(() => {
     if (!userData) {
@@ -19,7 +20,7 @@ function InterviewPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {step == 1 && (
+      {step === 1 && (
         <Setp1Setup
           onStart={(data) => {
             setInterviewData(data);
@@ -28,16 +29,18 @@ function InterviewPage() {
         />
       )}
 
-      {step == 2 && (
+      {step === 2 && interviewData && (
         <Step2Interview
           interviewData={interviewData}
-          onFinish={(Report) => {
+          onFinish={(report) => {
+            console.log("Report data:", report); // debug
+            setReportData(report); // ✅ report save karo
             setStep(3);
           }}
         />
       )}
 
-      {step == 3 && <Step3Report report={interviewData} />}
+      {step === 3 && <Step3Report report={reportData} />} {/* ✅ reportData bhejo */}
     </div>
   );
 }

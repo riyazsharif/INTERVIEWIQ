@@ -1,19 +1,28 @@
-import React from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import { BsRobot } from "react-icons/bs";
 import { IoSparkles } from "react-icons/io5";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { FcGoogle } from "react-icons/fc";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../utils/firebase";
-import { serverUrl } from "../App";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../redux/userSlice.js";
+import api from "../utils/api.js";
+import { useNavigate } from "react-router-dom";
 
 function Auth({isModel=false}) {
  const dispatch=useDispatch()
+ const navigate = useNavigate();
+ const [isSigningIn, setIsSigningIn] = useState(false);
+ const [authError, setAuthError] = useState("");
+
   const handleGoogleAuth = async () => {
+    if (isSigningIn) return;
+
     try {
+      setIsSigningIn(true);
+      setAuthError("");
+      provider.setCustomParameters({ prompt: "select_account" });
 
       const response = await signInWithPopup(auth, provider);
 
@@ -22,16 +31,26 @@ function Auth({isModel=false}) {
       const name = user.displayName;
       const email = user.email;
 
-      const result = await axios.post(
-        serverUrl + "/api/auth/google",
-        { name, email },
-        { withCredentials: true }
-      );
-       dispatch(setUserData(result.data))
+      const result = await api.post("/api/auth/google", { name, email });
+      const token = result?.data?.token;
+      const currentUser = result?.data?.user;
+
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+      dispatch(setUserData(currentUser || null))
+      navigate("/");
 
     } catch (error) {
-      console.log(error);
-         dispatch(setUserData(null))
+      console.error("Google login failed:", error.code || error.message, error);
+      setAuthError(
+        error.code === "auth/invalid-continue-uri"
+          ? "Firebase rejected this app URL. Add localhost, without a port, in Firebase Authentication authorized domains and confirm your Firebase project ID/auth domain match your .env."
+          : error.message || "Google login failed. Please try again."
+      );
+      dispatch(setUserData(null))
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
@@ -73,13 +92,20 @@ bg-white shadow-2xl border border-gray-200
 
         <motion.button
           onClick={handleGoogleAuth}
+          disabled={isSigningIn}
           whileHover={{ opacity: 0.9, scale: 1.03 }}
           whileTap={{ opacity: 1, scale: 0.9 }}
-          className="w-full flex items-center justify-center gap-3 py-3 bg-black text-white rounded-full shadow-md"
+          className="w-full flex items-center justify-center gap-3 py-3 bg-black text-white rounded-full shadow-md disabled:cursor-not-allowed disabled:opacity-60"
         >
           <FcGoogle size={20} />
-          Continue with Google
+          {isSigningIn ? "Signing in..." : "Continue with Google"}
         </motion.button>
+
+        {authError && (
+          <p className="mt-4 text-center text-sm leading-relaxed text-red-600">
+            {authError}
+          </p>
+        )}
 
       </motion.div>
 
